@@ -122,7 +122,7 @@ function generateCertificate(memberName, filePath) {
       .font("Helvetica")
       .text(
         `having duly completed the registration requirements, is hereby recognized as a Member of the HEALTH FOR ALL YOUTH ASSOCIATION (HAYA) in good standing, with all the rights, privileges, and responsibilities appertaining thereto. We welcome you into our community of young leaders dedicated to promoting health, youth empowerment, and social impact.`,
-        { align: "justify", width: doc.page.width 40}
+        { align: "justify"}
       );
 
     doc.moveDown(3);
@@ -132,7 +132,7 @@ function generateCertificate(memberName, filePath) {
       .fillColor("gray")
       .text(
         `"This certificate signifies the commitment of the bearer to the mission and vision of HAYA. Together for youth, together for health."`,
-        { align: "center", width:doc.page.width 40}
+        { align: "center"}
       );
 
     doc.moveDown(6);

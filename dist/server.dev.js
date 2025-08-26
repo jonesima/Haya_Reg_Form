@@ -145,13 +145,11 @@ function generateCertificate(memberName, filePath) {
     });
     doc.moveDown(1);
     doc.fontSize(12).fillColor("black").font("Helvetica").text("having duly completed the registration requirements, is hereby recognized as a Member of the HEALTH FOR ALL YOUTH ASSOCIATION (HAYA) in good standing, with all the rights, privileges, and responsibilities appertaining thereto. We welcome you into our community of young leaders dedicated to promoting health, youth empowerment, and social impact.", {
-      align: "justify",
-      width: doc.page.width - 160
+      align: "justify"
     });
     doc.moveDown(3);
     doc.font("Helvetica-Oblique").fillColor("gray").text("\"This certificate signifies the commitment of the bearer to the mission and vision of HAYA. Together for youth, together for health.\"", {
-      align: "center",
-      width: doc.page.width - 160
+      align: "center"
     });
     doc.moveDown(6); // Signature lines
 

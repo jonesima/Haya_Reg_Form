@@ -184,7 +184,7 @@ app.post("/certificate", async (req, res) => {
 });
 
 // --- Start server ---
-const PORT = 5500;
+const PORT = 5501;
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

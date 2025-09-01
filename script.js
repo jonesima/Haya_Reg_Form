@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Set current year in footer
-  document.getElementById("currentYear").textContent = new Date().getFullYear();
+  // ✅ Supabase client setup
+  const supabaseUrl = "https://radnoxjlhphknteblegk.supabase.co";
+  const supabaseKey = "YOUR_ANON_KEY"; // Replace with NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
   // Form elements
   const form = document.getElementById("memberForm");
@@ -9,7 +11,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const loadingOverlay = document.getElementById("loadingOverlay");
   const newRegistrationBtn = document.getElementById("newRegistrationBtn");
   const previewBtn = document.getElementById("previewBtn");
-  const downloadCertificateBtn = document.getElementById("downloadCertificateBtn");
+  const downloadCertificateBtn = document.getElementById(
+    "downloadCertificateBtn"
+  );
   const certificateDetails = document.getElementById("certificateDetails");
 
   // Error elements
@@ -24,19 +28,18 @@ document.addEventListener("DOMContentLoaded", function () {
     terms: document.getElementById("termsError"),
   };
 
-  // Preview certificate button click
+  // Preview certificate button
   if (previewBtn) {
     previewBtn.addEventListener("click", function () {
       const full_name = document.getElementById("full_name").value;
       if (full_name) {
         document.getElementById("previewName").textContent = full_name;
-        const today = new Date();
-        const formattedDate = today.toLocaleDateString("en-US", {
+        const today = new Date().toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
           day: "numeric",
         });
-        document.getElementById("previewDate").textContent = formattedDate;
+        document.getElementById("previewDate").textContent = today;
         certificateDetails.classList.remove("hidden");
       } else {
         alert("Please enter your full name to preview the certificate");
@@ -64,7 +67,6 @@ document.addEventListener("DOMContentLoaded", function () {
         "address",
         "terms",
       ];
-
       requiredFields.forEach((field) => {
         let fieldElement;
         let fieldValue;
@@ -82,30 +84,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!fieldValue) {
           errorElements[field].classList.remove("hidden");
-          if (fieldElement && field !== "gender" && field !== "terms") {
-            fieldElement.classList.add("input-error");
-          }
           isValid = false;
-        } else {
-          if (fieldElement && field !== "gender" && field !== "terms") {
-            fieldElement.classList.remove("input-error");
-          }
         }
       });
 
-      // Additional validation for email
+      // Email validation
       const email = document.getElementById("email").value.trim();
       if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         errorElements.email.classList.remove("hidden");
-        document.getElementById("email").classList.add("input-error");
         isValid = false;
       }
 
-      if (!isValid) {
-        return;
-      }
+      if (!isValid) return;
 
-      // Show loading overlay before sending request
+      // Show loading
       loadingOverlay.classList.remove("hidden");
 
       const formData = {
@@ -117,44 +109,34 @@ document.addEventListener("DOMContentLoaded", function () {
         email: document.getElementById("email").value.trim(),
         phone: document.getElementById("phone").value.trim(),
         address: document.getElementById("address").value.trim(),
-        terms: document.getElementById("terms").checked,
       };
 
-      fetch("http://localhost:5500/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      })
-        .then((response) => response.json())
-        .then((result) => {
-          loadingOverlay.classList.add("hidden");
-          if (result.success) {
-            registrationForm.classList.add("hidden");
-            successMessage.classList.remove("hidden");
-            successMessage.scrollIntoView({ behavior: "smooth" });
-          } else {
-            alert("Failed to save registration. Please try again.");
-          }
-        })
-        .catch(() => {
-          loadingOverlay.classList.add("hidden");
-          alert("Failed to save registration. Please try again.");
-        });
+      // ✅ Save to Supabase
+      const { error } = await supabaseClient.from("members").insert([formData]);
+
+      loadingOverlay.classList.add("hidden");
+
+      if (!error) {
+        registrationForm.classList.add("hidden");
+        successMessage.classList.remove("hidden");
+        successMessage.scrollIntoView({ behavior: "smooth" });
+      } else {
+        alert("Failed to save registration: " + error.message);
+      }
     });
   }
 
-  // New registration button click
+  // New registration button
   if (newRegistrationBtn) {
     newRegistrationBtn.addEventListener("click", function () {
       successMessage.classList.add("hidden");
       registrationForm.classList.remove("hidden");
       form.reset();
       certificateDetails.classList.add("hidden");
-      registrationForm.scrollIntoView({ behavior: "smooth" });
     });
   }
 
-  // Download certificate button click (POST to backend and trigger download)
+  // Download certificate as PDF
   if (downloadCertificateBtn) {
     downloadCertificateBtn.addEventListener("click", function () {
       const fullName = document.getElementById("full_name").value.trim();
@@ -165,22 +147,57 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      // Create a form and submit to download the PDF
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = "http://localhost:5500/certificate";
-      form.target = "_blank"; // Optional: open in new tab
-      form.style.display = "none";
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
 
-      const input = document.createElement("input");
-      input.type = "hidden";
-      input.name = "fullName";
-      input.value = fullName;
-      form.appendChild(input);
+      // Certificate styling
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(22);
+      doc.text("Certificate of Membership", 105, 40, { align: "center" });
 
-      document.body.appendChild(form);
-      form.submit();
-      document.body.removeChild(form);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(14);
+      doc.text("This certifies that", 105, 60, { align: "center" });
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.text(fullName, 105, 75, { align: "center" });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(14);
+      doc.text("has been officially registered as a member of the", 105, 90, {
+        align: "center",
+      });
+      doc.text("Health For All Youth Association (HAYA).", 105, 100, {
+        align: "center",
+      });
+
+      // Date
+      const today = new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      doc.setFontSize(12);
+      doc.text(`Issued on: ${today}`, 105, 120, { align: "center" });
+
+      // Signature placeholder
+      doc.setFontSize(12);
+      doc.text("__________________________", 105, 150, { align: "center" });
+      doc.text("Authorized Signature", 105, 160, { align: "center" });
+
+      // Save the PDF
+      doc.save(`${fullName}_certificate.pdf`);
     });
   }
 });
+
+const supabase = supabase.createClient(
+  "https://radnoxjlhphknteblegk.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhZG5veGpsaHBoa250ZWJsZWdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5MjIwMzEsImV4cCI6MjA3MTQ5ODAzMX0.Xj9itMcmyAAOH2bzV420f2D1dity793q0YkRK_85d2Q"
+);
+
+async function registerMember(data) {
+  const { error } = await supabase.from("members").insert([data]);
+  return !error;
+}

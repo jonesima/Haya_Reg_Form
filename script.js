@@ -1,8 +1,21 @@
 document.addEventListener("DOMContentLoaded", function () {
   // ✅ Supabase client setup
   const supabaseUrl = "https://radnoxjlhphknteblegk.supabase.co";
-  const supabaseKey = "YOUR_ANON_KEY"; // Replace with NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhZG5veGpsaHBoa250ZWJsZWdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5MjIwMzEsImV4cCI6MjA3MTQ5ODAzMX0.Xj9itMcmyAAOH2bzV420f2D1dity793q0YkRK_85d2Q"; // Replace with NEXT_PUBLIC_SUPABASE_ANON_KEY
   const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+//   <script src="https://unpkg.com/@supabase/supabase-js"></script>
+// <script>
+//   const supabase = supabase.createClient(
+//     "https://radnoxjlhphknteblegk.supabase.co",
+//     "YOUR_ANON_KEY"
+//   );
+
+  async function registerMember(data) {
+    const { error } = await supabase.from("members").insert([data]);
+    return !error;
+  }
+
 
   // Form elements
   const form = document.getElementById("memberForm");
@@ -84,7 +97,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!fieldValue) {
           errorElements[field].classList.remove("hidden");
+          if (fieldElement && field !== "gender" && field !== "terms") {
+            fieldElement.classList.add("input-error");
+          }
           isValid = false;
+        } else {
+          if (fieldElement && field !== "gender" && field !== "terms") {
+            fieldElement.classList.remove("input-error");
+          }
         }
       });
 
@@ -92,10 +112,11 @@ document.addEventListener("DOMContentLoaded", function () {
       const email = document.getElementById("email").value.trim();
       if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         errorElements.email.classList.remove("hidden");
+        document.getElementById("email").classList.add("input-error");
         isValid = false;
       }
 
-      if (!isValid) return;
+      if (!isValid) {return;}
 
       // Show loading
       loadingOverlay.classList.remove("hidden");
@@ -126,13 +147,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // New registration button
+  // New registration button click
   if (newRegistrationBtn) {
     newRegistrationBtn.addEventListener("click", function () {
       successMessage.classList.add("hidden");
       registrationForm.classList.remove("hidden");
       form.reset();
       certificateDetails.classList.add("hidden");
+      registrationForm.scrollIntoView({ behavior: "smooth" });
     });
   }
 
@@ -192,12 +214,4 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-const supabase = supabase.createClient(
-  "https://radnoxjlhphknteblegk.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhZG5veGpsaHBoa250ZWJsZWdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5MjIwMzEsImV4cCI6MjA3MTQ5ODAzMX0.Xj9itMcmyAAOH2bzV420f2D1dity793q0YkRK_85d2Q"
-);
 
-async function registerMember(data) {
-  const { error } = await supabase.from("members").insert([data]);
-  return !error;
-}

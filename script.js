@@ -172,25 +172,36 @@ document.addEventListener("DOMContentLoaded", function () {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
+      // --- Rounded Logo ---
+    const logoPath = "./img/haya.png";
+    if (fs.existsSync(logoPath)) {
+      doc.save();
+      doc.circle(300, 100, 60).clip();
+      doc.image(logoPath, 105, 40, { width: 120, height: 120 });
+      doc.restore();
+    }
+      
       // Certificate styling
       doc.setFont("helvetica", "bold");
       doc.setFontSize(22);
-      doc.text("Certificate of Membership", 105, 40, { align: "center" });
+      doc.text("Certificate of Membership", 105, 60, { align: "center" });
+
+      doc.movedown(4);
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(14);
-      doc.text("This certifies that", 105, 60, { align: "center" });
+      doc.text("This certifies that", 105, 80, { align: "center" });
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(18);
-      doc.text(fullName, 105, 75, { align: "center" });
+      doc.text(fullName, 105, 95, { align: "center" });
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(14);
-      doc.text("has been officially registered as a member of the", 105, 90, {
+      doc.text("has been officially registered as a member of the", 105, 110, {
         align: "center",
       });
-      doc.text("Health For All Youth Association (HAYA).", 105, 100, {
+      doc.text("Health For All Youth Association (HAYA).", 105, 130, {
         align: "center",
       });
 
@@ -201,12 +212,12 @@ document.addEventListener("DOMContentLoaded", function () {
         day: "numeric",
       });
       doc.setFontSize(12);
-      doc.text(`Issued on: ${today}`, 105, 120, { align: "center" });
+      doc.text(`Issued on: ${today}`, 105, 150, { align: "center" });
 
       // Signature placeholder
       doc.setFontSize(12);
-      doc.text("__________________________", 105, 150, { align: "center" });
-      doc.text("Authorized Signature", 105, 160, { align: "center" });
+      doc.text("__________________________", 105, 190, { align: "center" });
+      doc.text("Authorized Signature", 105, 200, { align: "center" });
 
       // Save the PDF
       doc.save(`${fullName}_certificate.pdf`);

@@ -172,21 +172,16 @@ document.addEventListener("DOMContentLoaded", function () {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
-      // --- Rounded Logo ---
-    const logoPath = "./img/haya.png";
-    if (fs.existsSync(logoPath)) {
-      doc.save();
-      doc.circle(300, 100, 60).clip();
-      doc.image(logoPath, 105, 40, { width: 120, height: 120 });
-      doc.restore();
-    }
-      
       // Certificate styling
+      doc
+      .rect(20, 20, doc.page.width - 40, doc.page.height - 40)
+      .lineWidth(4)
+      .strokeColor("#0056A1")
+      .stroke();
+
       doc.setFont("helvetica", "bold");
       doc.setFontSize(22);
       doc.text("Certificate of Membership", 105, 60, { align: "center" });
-
-      doc.movedown(4);
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(14);
@@ -216,8 +211,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Signature placeholder
       doc.setFontSize(12);
-      doc.text("__________________________", 105, 190, { align: "center" });
-      doc.text("Authorized Signature", 105, 200, { align: "center" });
+      doc.text("__________________________", 105, 180, { align: "center" });
+      doc.text("Authorized Signature", 105, 190, { align: "center" });
 
       // Save the PDF
       doc.save(`${fullName}_certificate.pdf`);

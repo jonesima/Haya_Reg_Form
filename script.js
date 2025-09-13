@@ -4,11 +4,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhZG5veGpsaHBoa250ZWJsZWdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5MjIwMzEsImV4cCI6MjA3MTQ5ODAzMX0.Xj9itMcmyAAOH2bzV420f2D1dity793q0YkRK_85d2Q";
   const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-  async function registerMember(data) {
-    const { error } = await supabase.from("members").insert([data]);
-    return !error;
-  }
-
   // Form elements
   const form = document.getElementById("memberForm");
   const registrationForm = document.getElementById("registrationForm");
@@ -155,44 +150,49 @@ document.addEventListener("DOMContentLoaded", function () {
     downloadCertificateBtn.addEventListener("click", function () {
       const fullName = document.getElementById("full_name").value.trim();
       if (!fullName) {
-        alert(
-          "Please enter your full name before downloading the certificate."
-        );
+        alert("Please enter your full name before downloading the certificate.");
         return;
       }
 
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
-      // Logo (top center)
-      doc.addImage("./img/haya.png", "PNG", 80, 5, 50, 50);
+      // === Border ===
+      doc.setLineWidth(2);
+      doc.rect(10, 10, 190, 277);
+
+      // === Rounded Logo (top center) ===
+      // Draw a circle mask
+      doc.setDrawColor(255, 255, 255);
+      doc.circle(105, 40, 25, "S");
+      doc.addImage("./img/haya.png", "PNG", 80, 15, 50, 50);
 
       // Title
       doc.setFont("helvetica", "bold");
       doc.setFontSize(22);
-      doc.text("CERTIFICATE OF MEMBERSHIP", 105, 60, { align: "center" });
+      doc.text("CERTIFICATE OF MEMBERSHIP", 105, 80, { align: "center" });
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(14);
-      doc.text("This is to certify that", 105, 80, { align: "center" });
+      doc.text("This is to certify that", 105, 95, { align: "center" });
 
       // Member name
       doc.setFont("helvetica", "bold");
       doc.setFontSize(18);
-      doc.text(fullName, 105, 95, { align: "center" });
+      doc.text(fullName, 105, 110, { align: "center" });
 
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(14);
+      doc.setFontSize(13);
       doc.text(
         "having duly completed the registration requirements, is hereby recognized as a",
         105,
-        110,
+        125,
         { align: "center", maxWidth: 180 }
       );
       doc.text(
         "Member of the HEALTH FOR ALL YOUTH ASSOCIATION (HAYA) in good standing.",
         105,
-        120,
+        135,
         { align: "center", maxWidth: 180 }
       );
 
@@ -202,31 +202,28 @@ document.addEventListener("DOMContentLoaded", function () {
       doc.text(
         `"Together for youth, together for health."`,
         105,
-        140,
+        155,
         { align: "center" }
       );
 
-      // --- Seal watermark ---
-      doc.setGState(new doc.GState({ opacity: 0.2 }));
-      doc.addImage("./img/seal.png", "PNG", 55, 100, 100, 100);
-      doc.setGState(new doc.GState({ opacity: 1 }));
+      // --- Seal (under the quote, full opacity) ---
+      doc.addImage("./img/seal.png", "PNG", 70, 165, 70, 70);
 
-      // Signature line + signature
+      // === Signature bottom-right ===
+      doc.addImage("./img/signature.jpg", "JPG", 130, 230, 60, 25);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(12);
-      doc.text("__________________________", 40, 220);
-      doc.text("President / National Chairman", 40, 230);
+      doc.text("__________________________", 125, 260);
+      doc.text("President / National Chairman", 125, 270);
 
-      // Signature image on line
-      doc.addImage("./img/signature.jpg", "JPG", 45, 200, 60, 25);
-
-      // Date
+      // === Issued date bottom-left ===
       const today = new Date().toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
       });
-      doc.text(`Issued on: ${today}`, 40, 250);
+      doc.setFontSize(12);
+      doc.text(`Issued on: ${today}`, 20, 270);
 
       // Save PDF
       doc.save(`${fullName}_certificate.pdf`);

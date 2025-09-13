@@ -1,21 +1,13 @@
 document.addEventListener("DOMContentLoaded", function () {
   // ✅ Supabase client setup
   const supabaseUrl = "https://radnoxjlhphknteblegk.supabase.co";
-  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhZG5veGpsaHBoa250ZWJsZWdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5MjIwMzEsImV4cCI6MjA3MTQ5ODAzMX0.Xj9itMcmyAAOH2bzV420f2D1dity793q0YkRK_85d2Q"; // Replace with NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJhZG5veGpsaHBoa250ZWJsZWdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5MjIwMzEsImV4cCI6MjA3MTQ5ODAzMX0.Xj9itMcmyAAOH2bzV420f2D1dity793q0YkRK_85d2Q";
   const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-
-//   <script src="https://unpkg.com/@supabase/supabase-js"></script>
-// <script>
-//   const supabase = supabase.createClient(
-//     "https://radnoxjlhphknteblegk.supabase.co",
-//     "YOUR_ANON_KEY"
-//   );
 
   async function registerMember(data) {
     const { error } = await supabase.from("members").insert([data]);
     return !error;
   }
-
 
   // Form elements
   const form = document.getElementById("memberForm");
@@ -24,9 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const loadingOverlay = document.getElementById("loadingOverlay");
   const newRegistrationBtn = document.getElementById("newRegistrationBtn");
   const previewBtn = document.getElementById("previewBtn");
-  const downloadCertificateBtn = document.getElementById(
-    "downloadCertificateBtn"
-  );
+  const downloadCertificateBtn = document.getElementById("downloadCertificateBtn");
   const certificateDetails = document.getElementById("certificateDetails");
 
   // Error elements
@@ -116,7 +106,9 @@ document.addEventListener("DOMContentLoaded", function () {
         isValid = false;
       }
 
-      if (!isValid) {return;}
+      if (!isValid) {
+        return;
+      }
 
       // Show loading
       loadingOverlay.classList.remove("hidden");
@@ -172,27 +164,61 @@ document.addEventListener("DOMContentLoaded", function () {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
-      // Certificate styling
+      // Logo (top center)
+      doc.addImage("./img/haya.png", "PNG", 80, 5, 50, 50);
+
+      // Title
       doc.setFont("helvetica", "bold");
       doc.setFontSize(22);
-      doc.text("Certificate of Membership", 105, 40, { align: "center" });
+      doc.text("CERTIFICATE OF MEMBERSHIP", 105, 60, { align: "center" });
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(14);
-      doc.text("This certifies that", 105, 60, { align: "center" });
+      doc.text("This is to certify that", 105, 80, { align: "center" });
 
+      // Member name
       doc.setFont("helvetica", "bold");
       doc.setFontSize(18);
-      doc.text(fullName, 105, 75, { align: "center" });
+      doc.text(fullName, 105, 95, { align: "center" });
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(14);
-      doc.text("has been officially registered as a member of the", 105, 90, {
-        align: "center",
-      });
-      doc.text("Health For All Youth Association (HAYA).", 105, 100, {
-        align: "center",
-      });
+      doc.text(
+        "having duly completed the registration requirements, is hereby recognized as a",
+        105,
+        110,
+        { align: "center", maxWidth: 180 }
+      );
+      doc.text(
+        "Member of the HEALTH FOR ALL YOUTH ASSOCIATION (HAYA) in good standing.",
+        105,
+        120,
+        { align: "center", maxWidth: 180 }
+      );
+
+      // Quote
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(12);
+      doc.text(
+        `"Together for youth, together for health."`,
+        105,
+        140,
+        { align: "center" }
+      );
+
+      // --- Seal watermark ---
+      doc.setGState(new doc.GState({ opacity: 0.2 }));
+      doc.addImage("./img/seal.png", "PNG", 55, 100, 100, 100);
+      doc.setGState(new doc.GState({ opacity: 1 }));
+
+      // Signature line + signature
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
+      doc.text("__________________________", 40, 220);
+      doc.text("President / National Chairman", 40, 230);
+
+      // Signature image on line
+      doc.addImage("./img/signature.jpg", "JPG", 45, 200, 60, 25);
 
       // Date
       const today = new Date().toLocaleDateString("en-US", {
@@ -200,18 +226,10 @@ document.addEventListener("DOMContentLoaded", function () {
         month: "long",
         day: "numeric",
       });
-      doc.setFontSize(12);
-      doc.text(`Issued on: ${today}`, 105, 120, { align: "center" });
+      doc.text(`Issued on: ${today}`, 40, 250);
 
-      // Signature placeholder
-      doc.setFontSize(12);
-      doc.text("__________________________", 105, 150, { align: "center" });
-      doc.text("Authorized Signature", 105, 160, { align: "center" });
-
-      // Save the PDF
+      // Save PDF
       doc.save(`${fullName}_certificate.pdf`);
     });
   }
 });
-
-

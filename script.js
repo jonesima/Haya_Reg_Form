@@ -284,7 +284,7 @@ document.addEventListener("DOMContentLoaded", function () {
       doc.setFont("helvetica", "italic");
       doc.setFontSize(12);
       doc.text(
-        `"Together for youth, together for health."`,
+        `"Together we build bridges of Hope"`,
         105,
         155,
         { align: "center" }

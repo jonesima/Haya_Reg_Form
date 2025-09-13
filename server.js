@@ -65,51 +65,42 @@ function generateCertificate(memberName, filePath) {
       month: "long",
       day: "numeric",
     });
-    const formattedTime = now.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
 
-    // Add a border
+    // Add border
     doc
       .rect(20, 20, doc.page.width - 40, doc.page.height - 40)
-      .lineWidth(4)
-      .strokeColor("#0056A1")
+      .lineWidth(3)
+      .strokeColor("#0A2540")
       .stroke();
 
-    // --- Rounded Logo ---
+    // Logo (top center)
     const logoPath = "./img/haya.png";
     if (fs.existsSync(logoPath)) {
-      doc.save();
-      doc.circle(300, 100, 60).clip();
-      doc.image(logoPath, 240, 40, { width: 120, height: 120 });
-      doc.restore();
+      doc.image(logoPath, doc.page.width / 2 - 40, 30, { width: 80 });
     }
 
-    // Title directly under the logo
+    // Title
     doc
-      .fontSize(22)
+      .fontSize(26)
       .font("Helvetica-Bold")
       .fillColor("#0A2540")
-      .text("CERTIFICATE OF MEMBERSHIP", 0, 170, {
+      .text("CERTIFICATE OF MEMBERSHIP", 0, 130, {
         align: "center",
-        underline: true,
       });
 
-    doc.moveDown(4);
+    doc.moveDown(2);
 
     doc
       .fontSize(14)
       .fillColor("black")
       .font("Helvetica")
-      .text("This is to proudly certify that", { align: "center" });
+      .text("This is to certify that", { align: "center" });
 
     doc.moveDown(1);
 
     // Member’s Name
     doc
-      .fontSize(20)
+      .fontSize(22)
       .font("Helvetica-Bold")
       .fillColor("#0056A1")
       .text(memberName, { align: "center" });
@@ -121,39 +112,53 @@ function generateCertificate(memberName, filePath) {
       .fillColor("black")
       .font("Helvetica")
       .text(
-        `having duly completed the registration requirements, is hereby recognized as a Member of the HEALTH FOR ALL YOUTH ASSOCIATION (HAYA) in good standing, with all the rights, privileges, and responsibilities appertaining thereto. We welcome you into our community of young leaders dedicated to promoting health, youth empowerment, and social impact.`,
-        { align: "justify"}
+        `having duly completed the registration requirements, is hereby recognized as a Member of the HEALTH FOR ALL YOUTH ASSOCIATION (HAYA) in good standing, with all the rights, privileges, and responsibilities appertaining thereto.`,
+        {
+          align: "justify",
+          indent: 30,
+          lineGap: 4,
+        }
       );
 
-    doc.moveDown(3);
+    doc.moveDown(2);
 
     doc
       .font("Helvetica-Oblique")
       .fillColor("gray")
       .text(
         `"This certificate signifies the commitment of the bearer to the mission and vision of HAYA. Together for youth, together for health."`,
-        { align: "center"}
+        {
+          align: "center",
+          lineGap: 4,
+        }
       );
 
-    doc.moveDown(6);
+    // --- Seal (watermark style in center) ---
+    const sealPath = "./img/seal.png";
+    if (fs.existsSync(sealPath)) {
+      doc.opacity(0.2);
+      doc.image(sealPath, doc.page.width / 2 - 100, 250, { width: 200 });
+      doc.opacity(1); // reset opacity
+    }
 
-    // Signature lines
-    doc
-      .font("Helvetica")
-      .fillColor("black")
-      .text("_________________________", 100, 600)
-      .text("_________________________", 400, 600);
+    // --- Signature (President only) ---
+    const signaturePath = "./img/signature.jpg";
+    if (fs.existsSync(signaturePath)) {
+      doc.image(signaturePath, 100, 580, { width: 120 });
+    }
 
-    doc
-      .fontSize(10)
-      .text("President / National Chairman", 100, 620)
-      .text("General Secretary", 400, 620);
-
-    // Date and time
+    // Signature line + title
     doc
       .fontSize(12)
       .fillColor("black")
-      .text(`Dated this ${formattedDate} at ${formattedTime}`, 200, 670);
+      .text("_________________________", 100, 610)
+      .text("President / National Chairman", 100, 630);
+
+    // Date
+    doc
+      .fontSize(12)
+      .fillColor("black")
+      .text(`Issued on: ${formattedDate}`, 100, 670);
 
     doc.end();
 

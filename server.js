@@ -152,7 +152,8 @@ function generateCertificate(memberName, filePath) {
       .fontSize(12)
       .fillColor("black")
       .text("_________________________", 100, 610)
-      .text("President / National Chairman", 100, 630);
+      .text("ADEFALA ESTHER OMOLARA", 100, 620)
+      .text("HAYA President", 100, 630);
 
     // Date
     doc

@@ -108,55 +108,66 @@ function generateCertificate(memberName, filePath) {
       year: "numeric",
       month: "long",
       day: "numeric"
-    });
-    var formattedTime = now.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit"
-    }); // Add a border
+    }); // Add border
 
-    doc.rect(20, 20, doc.page.width - 40, doc.page.height - 40).lineWidth(4).strokeColor("#0056A1").stroke(); // --- Rounded Logo ---
+    doc.rect(20, 20, doc.page.width - 40, doc.page.height - 40).lineWidth(3).strokeColor("#0A2540").stroke(); // Logo (top center)
 
     var logoPath = "./img/haya.png";
 
     if (fs.existsSync(logoPath)) {
-      doc.save();
-      doc.circle(300, 100, 60).clip();
-      doc.image(logoPath, 240, 40, {
-        width: 120,
-        height: 120
+      doc.image(logoPath, doc.page.width / 2 - 40, 30, {
+        width: 80
       });
-      doc.restore();
-    } // Title directly under the logo
+    } // Title
 
 
-    doc.fontSize(22).font("Helvetica-Bold").fillColor("#0A2540").text("CERTIFICATE OF MEMBERSHIP", 0, 170, {
-      align: "center",
-      underline: true
+    doc.fontSize(26).font("Helvetica-Bold").fillColor("#0A2540").text("CERTIFICATE OF MEMBERSHIP", 0, 130, {
+      align: "center"
     });
-    doc.moveDown(4);
-    doc.fontSize(14).fillColor("black").font("Helvetica").text("This is to proudly certify that", {
+    doc.moveDown(2);
+    doc.fontSize(14).fillColor("black").font("Helvetica").text("This is to certify that", {
       align: "center"
     });
     doc.moveDown(1); // Member’s Name
 
-    doc.fontSize(20).font("Helvetica-Bold").fillColor("#0056A1").text(memberName, {
+    doc.fontSize(22).font("Helvetica-Bold").fillColor("#0056A1").text(memberName, {
       align: "center"
     });
     doc.moveDown(1);
-    doc.fontSize(12).fillColor("black").font("Helvetica").text("having duly completed the registration requirements, is hereby recognized as a Member of the HEALTH FOR ALL YOUTH ASSOCIATION (HAYA) in good standing, with all the rights, privileges, and responsibilities appertaining thereto. We welcome you into our community of young leaders dedicated to promoting health, youth empowerment, and social impact.", {
-      align: "justify"
+    doc.fontSize(12).fillColor("black").font("Helvetica").text("having duly completed the registration requirements, is hereby recognized as a Member of the HEALTH FOR ALL YOUTH ASSOCIATION (HAYA) in good standing, with all the rights, privileges, and responsibilities appertaining thereto.", {
+      align: "justify",
+      indent: 30,
+      lineGap: 4
     });
-    doc.moveDown(3);
+    doc.moveDown(2);
     doc.font("Helvetica-Oblique").fillColor("gray").text("\"This certificate signifies the commitment of the bearer to the mission and vision of HAYA. Together for youth, together for health.\"", {
-      align: "center"
-    });
-    doc.moveDown(6); // Signature lines
+      align: "center",
+      lineGap: 4
+    }); // --- Seal (watermark style in center) ---
 
-    doc.font("Helvetica").fillColor("black").text("_________________________", 100, 600).text("_________________________", 400, 600);
-    doc.fontSize(10).text("President / National Chairman", 100, 620).text("General Secretary", 400, 620); // Date and time
+    var sealPath = "./img/seal.png";
 
-    doc.fontSize(12).fillColor("black").text("Dated this ".concat(formattedDate, " at ").concat(formattedTime), 200, 670);
+    if (fs.existsSync(sealPath)) {
+      doc.opacity(0.2);
+      doc.image(sealPath, doc.page.width / 2 - 100, 250, {
+        width: 200
+      });
+      doc.opacity(1); // reset opacity
+    } // --- Signature (President only) ---
+
+
+    var signaturePath = "./img/signature.jpg";
+
+    if (fs.existsSync(signaturePath)) {
+      doc.image(signaturePath, 100, 580, {
+        width: 120
+      });
+    } // Signature line + title
+
+
+    doc.fontSize(12).fillColor("black").text("_________________________", 100, 610).text("ADEFALA ESTHER OMOLARA", 100, 620).text("HAYA President", 100, 630); // Date
+
+    doc.fontSize(12).fillColor("black").text("Issued on: ".concat(formattedDate), 100, 670);
     doc.end();
     stream.on("finish", function () {
       return resolve(filePath);
@@ -212,7 +223,7 @@ app.post("/certificate", function _callee2(req, res) {
   }, null, null, [[3, 13]]);
 }); // --- Start server ---
 
-var PORT = 5500;
+var PORT = 5501;
 app.listen(PORT, function () {
   console.log("Server running at http://localhost:".concat(PORT));
 });

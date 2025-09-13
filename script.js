@@ -299,7 +299,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // === Signature bottom-right ===
       try {
-        doc.addImage("./img/signature.jpg", "JPG", 130, 230, 60, 25);
+        doc.addImage("./img/signature.jpg", "JPG", 130, 240, 60, 25);
       } catch (err) {
         // ignore image errors
       }

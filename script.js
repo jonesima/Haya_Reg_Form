@@ -306,7 +306,8 @@ document.addEventListener("DOMContentLoaded", function () {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(12);
       doc.text("__________________________", 125, 260);
-      doc.text("President / National Chairman", 125, 270);
+      doc.text("ADEFALA ESTHER OMOLARA", 125, 270)
+      doc.text("HAYA President", 125, 280);
 
       // === Issued date bottom-left ===
       const today = new Date().toLocaleDateString("en-US", {
